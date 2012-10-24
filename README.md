@@ -49,6 +49,46 @@ on Ubuntu Linux 12.04 64-bit.
 3. Copy the binary *stc* in any directory. 
 
 **Usage of the console application**
+
+./stc [OPTIONS]
+
+Options:
+
+ -M - mode, required:
+         t - train a text classification model.
+         p - classify text with an existing model.
+         e - extract features from text.
+
+ -i - input XML file with texts, required.
+
+ -s - stopwords file, required.
+
+ -p - stop part of speech file, required.
+
+ -r - semantic relations file, required.
+
+ -V - vocabulary file, required. Input for prediction mode, output for the training mode.
+
+ -m - model file, required. Input for prediction mode, output for training mode.
+
+ -N - normalization of bag-of-word feature vectors, default 'u'.
+         0 - frequency counts of words (no normalization)
+         1 - unit length normalization
+
+ -v true - verbose output
+
+ -R - type of the text expansion, default '0'.
+         0 - no expansion
+         1 - first order expansion
+         2 - second order expansion
+         3 - recursive expansion
+
+ -E - number of per term expansions, default '0'.
+
+ -W - weight [0;1] of the expanded terms w.r.t. original terms, default '0'.
+
+ -h - print this help message
+
 **Usage of the library**
 
 3. Link your C/C++ program to libicop_text_classifier.so. Directory client-sample contains an example of a C program linked to the library (see makefile in Debug directory). You can open client-sample with Eclipse CDT or compile it with the provided makefile. 
