@@ -46,8 +46,9 @@ on Ubuntu Linux 12.04 64-bit.
 
 2. Register the new shared libraries: "sudo ldconfig"
 
-3. Copy the binary *stc* in any directory. Use it as following:
+3. Copy the binary *stc* in any directory. 
 
+**Usage of the console application**
 **Usage of the library**
 
 3. Link your C/C++ program to libicop_text_classifier.so. Directory client-sample contains an example of a C program linked to the library (see makefile in Debug directory). You can open client-sample with Eclipse CDT or compile it with the provided makefile. 
