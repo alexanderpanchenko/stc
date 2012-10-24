@@ -4,6 +4,7 @@ stc
 A tool for Short Text Classification. 
 A library and a console application designed for short text classification. It let you train and use classifiers of short texts such as filenames. The input texts are provided in XML files (console application, library) or as C structures (library). 
 
+
 Binary Verison 
 --------------
 
