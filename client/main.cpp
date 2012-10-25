@@ -19,7 +19,7 @@
 #include "TextExpander.hpp"
 #include "share_headers.hpp"
 #include "textclassifier.h"
-
+#include <getopt.h>
 #include "ClassifierManager.hpp"
 
 using namespace std;
@@ -343,11 +343,13 @@ bool load_params(int argc, char* argv[]) {
 	return !required_not_set && files_exist;
 }
 
+
+/*
 void test1(){
 	FreqVocabulary* fv = new FreqVocabulary("/home/sasha/Desktop/relations/vocabulary.csv");
 		TextExpander* te = new TextExpander("/home/sasha/Desktop/relations/ww/concepts-41729.csv_dir/relations.csv", fv);
 
-		/*
+		
 		for(long id=100; id < 200; id++){
 			list<long> res = te->expand_id2id(id);
 			if(res.size()>0){
@@ -363,7 +365,7 @@ void test1(){
 				te->print_term_list(res);
 			}
 		}
-		*/
+	
 
 		int exp_num = 3;
 		double w = 0.5;
@@ -374,7 +376,7 @@ void test1(){
 		//int num=6; string title[6] = {"big-tit", "milf", "shay", "fox", "get", "banged"};
 		//int num = 2; string title[2] = {"sex", "french"};
 		for(int i=0; i < num; i++) {
-			long id = fv->get_word_id_ifexists(title[i]);
+			long id = fv->get_wordid_ifexists(title[i]);
 			if(id != -1){
 				br->increment_word(id);
 				bf->increment_word(id);
@@ -397,6 +399,7 @@ void test1(){
 		te->print_vector(bs);
 }
 
+
 void test2(){
 	printf("test\n");
 	//TextExpanderParams* p = new TextExpanderParams();
@@ -404,9 +407,7 @@ void test2(){
 	if(p.type == SECOND_ORDER_EXP) printf("%d,%d,%f", (int)p.type, p.max_expansions, p.expansion_weight);
 }
 
-/**
- * This function executes some debug tests.
- * */
+
 void run_test(){
 	void* c = TextClassifier_Create("/home/sasha/Desktop/text_classifier_data/", 1);
 	TextClassifier_PrintInfo(c);
@@ -573,4 +574,4 @@ ip->pNext = NULL;
 return ip_begin;
 }
 
-
+*/

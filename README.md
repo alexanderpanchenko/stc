@@ -118,4 +118,9 @@ TextClassifier_Predict(cm, (params.inputFile + ".xml").c_str(), 3, text);
 TextClassifier_PrintInfo(cm);
 TextClassifier_Destroy(cm);
 ```
+**Recompilation**
 
+On Ubuntu 11.10 or higher install (in addition to the packages indicated above)
+1. sudo apt-get install libc6-dev-i386
+
+2. sudo apt-get install g++-multilib
