@@ -121,6 +121,11 @@ TextClassifier_Destroy(cm);
 **Recompilation**
 
 On Ubuntu 11.10 or higher install (in addition to the packages indicated above)
+
 1. sudo apt-get install libc6-dev-i386
 
 2. sudo apt-get install g++-multilib
+
+3. go to release-library to build library 
+
+4. go to release-client to build client
