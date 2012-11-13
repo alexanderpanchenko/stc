@@ -126,7 +126,7 @@ On Ubuntu 11.10 or higher install (in addition to the packages indicated above)
 
 2. sudo apt-get install g++-multilib
 
-3. Open in Eclipse CDT project in the library and build in the Release mode
+3. make.
 
-4. Open in Eclipse CDT project in the client and build in the Release mode
+Note: Alternatively to the make, you can build the sources in Eclipse. The Eclipse CDT projects are in library and client directories. Build in the Release mode.
 
