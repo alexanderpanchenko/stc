@@ -269,14 +269,14 @@ list<bool> Classifier::text2vector(TextToClassify* text, string output_fpath,
 	FreqVocabulary relation_voc = _expander->get_vocabulary(); // Debug
 	// Read texts
 	while(text){
-		// printf("\n\nText:%s\nFeatures:", text->sText); // Debug
+		//printf("\n\nText:%s\nFeatures:", text->sText); // Debug
 		// Convert tokens to a numerical vector
 		token = text->pToken;
 		features = new BowVector();
 		int token_id;
 
 		while(token){
-			// printf("'%s', ", token->sLemma); // Debug
+			printf("'%s', ", token->sLemma); // Debug
 			if(token->sLemma && !skip_token(token->sLemma)) {
 				string lemma(token->sLemma);
 				if(!_model_is_loaded){
@@ -298,13 +298,13 @@ list<bool> Classifier::text2vector(TextToClassify* text, string output_fpath,
 					}
 
 					// Debug
-					//cout << "expand" << endl;
-					//if(projected_terms.size() > 0) cout << lemma << ":" << relation_voc.get_word_by_id_debug(*(projected_terms.begin())) << ":" << projected_terms.size() << endl;
-					//cout << "\n>>>" << lemma << " = ";
-					//for(list<long>::iterator it = projected_terms.begin(); it != projected_terms.end(); it++) {
-					//	cout << *it << ":" << relation_voc.get_word_by_id_debug(*it) << ", ";
-					//}
-					//cout << "." << endl;
+					cout << "expand" << endl;
+					if(projected_terms.size() > 0) cout << lemma << ":" << relation_voc.get_word_by_id_debug(*(projected_terms.begin())) << ":" << projected_terms.size() << endl;
+					cout << "\n>>>" << lemma << " = ";
+					for(list<long>::iterator it = projected_terms.begin(); it != projected_terms.end(); it++) {
+						cout << *it << ":" << relation_voc.get_word_by_id_debug(*it) << ", ";
+					}
+					cout << "." << endl;
 				}
 			}
 			token = token->pNext;

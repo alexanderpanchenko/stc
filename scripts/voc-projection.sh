@@ -1,22 +1,22 @@
 #!/bin/bash
 
 #for k in 0 1 3 5 10 15 20 30 50 100
-for k in 10 20 30 50 100
+for k in 30 
 do
 	#echo ""
 	#echo "============================================"
 	#echo "k=$k, train=gallery-train, test=gallery-valid"
-	#./classify.sh ./../data/test/valid.xml ./../data/test/ $k 
+	#./classify.sh ./../data/gallery/valid.xml ./../data/gallery/ $k 
 	
 	echo ""
 	echo "============================================"
 	echo "k=$k, train=gallery-train, test=piratebay-TT-train"
-	./classify.sh ./../data/tt/train.xml ./../data/test/ $k 
+	./classify.sh ./../data/tt/train.xml ./../data/gallery/ $k 
 	
-	echo ""
-	echo "============================================"
-	echo "k=$k, train=gallery-train, test=piratebay-TT-valid"
-	./classify.sh ./../data/tt/valid.xml ./../data/test/ $k 
+	#echo ""
+	#echo "============================================"
+	#echo "k=$k, train=gallery-train, test=piratebay-TT-valid"
+	#./classify.sh ./../data/tt/valid.xml ./../data/gallery/ $k 
 	
 	#echo ""
 	#echo "============================================"

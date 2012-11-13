@@ -14,48 +14,48 @@ INCLUDE=./include
 
 all: stc
 
-stc: main.o libshort_text_classifier.so
+stc: ./client/main.o ./bin/libshort_text_classifier.so
 	$(CC) -L./bin -o ./bin/stc ./client/main.o -lshort_text_classifier 
-main.o: 
+./client/main.o: 
 	$(CC) -I./library -O3 -Wall -c -fmessage-length=0 -MMD -MP -MF"./client/main.d" -MT"./client/main.d" -o ./client/main.o ./client/main.cpp 
 
 #####################
 # The shared library  
 
-libshort_text_classifier.so: BowVector.o Classifier.o ClassifierManager.o FreqVocabulary.o TextExpander.o Vocabulary.o classifier_c.o predict.o share_headers.o textclassifier.o train.o 
+./bin/libshort_text_classifier.so: ./library/BowVector.o ./library/Classifier.o ./library/ClassifierManager.o ./library/FreqVocabulary.o ./library/TextExpander.o ./library/Vocabulary.o ./library/classifier_c.o ./library/predict.o ./library/share_headers.o ./library/textclassifier.o ./library/train.o 
 	$(CC) -L./bin -shared -o ./bin/libshort_text_classifier.so ./library/BowVector.o ./library/Classifier.o ./library/ClassifierManager.o ./library/FreqVocabulary.o ./library/TextExpander.o ./library/Vocabulary.o ./library/classifier_c.o ./library/predict.o ./library/share_headers.o ./library/textclassifier.o ./library/train.o -lboost_regex -lboost_system -lboost_filesystem -llinear
 
-BowVector.o: 
+./library/BowVector.o:  ./library/BowVector.cpp ./library/BowVector.hpp
 	$(CC) -I$(INCLUDE) $(FLAGS) -MF"./library/BowVector.d" -MT"./library/BowVector.d" -o ./library/BowVector.o ./library/BowVector.cpp
  
-Classifier.o: 
+./library/Classifier.o: ./library/Classifier.cpp ./library/Classifier.hpp
 	$(CC) -I$(INCLUDE) $(FLAGS) -MF"./library/Classifier.d" -MT"./library/Classifier.d" -o ./library/Classifier.o ./library/Classifier.cpp
 
-ClassifierManager.o: 
+./library/ClassifierManager.o: ./library/ClassifierManager.cpp ./library/ClassifierManager.hpp
 	$(CC) -I$(INCLUDE) $(FLAGS) -MF"./library/ClassifierManager.d" -MT"./library/ClassifierManager.d" -o ./library/ClassifierManager.o ./library/ClassifierManager.cpp
  
-FreqVocabulary.o: 
+./library/FreqVocabulary.o: ./library/FreqVocabulary.cpp ./library/FreqVocabulary.hpp
 	$(CC) -I$(INCLUDE) $(FLAGS) -MF"./library/FreqVocabulary.d" -MT"./library/FreqVocabulary.d" -o ./library/FreqVocabulary.o ./library/FreqVocabulary.cpp
 
-TextExpander.o: 
+./library/TextExpander.o: ./library/TextExpander.cpp ./library/TextExpander.hpp
 	$(CC) -I$(INCLUDE) $(FLAGS) -MF"./library/TextExpander.d" -MT"./library/TextExpander.d" -o ./library/TextExpander.o ./library/TextExpander.cpp
  
-Vocabulary.o: 
+./library/Vocabulary.o: ./library/Vocabulary.cpp ./library/Vocabulary.hpp
 	$(CC) -I$(INCLUDE) $(FLAGS) -MF"./library/Vocabulary.d" -MT"./library/Vocabulary.d" -o ./library/Vocabulary.o ./library/Vocabulary.cpp
 
-classifier_c.o: 
+./library/classifier_c.o: ./library/classifier_c.cpp ./library/classifier_c.h
 	$(CC) -I$(INCLUDE) $(FLAGS) -MF"./library/classifier_c.d" -MT"./library/classifier_c.d" -o ./library/classifier_c.o ./library/classifier_c.cpp
  
-predict.o: 
+./library/predict.o: ./library/predict.cpp ./library/linear.hpp
 	$(CC) -I$(INCLUDE) $(FLAGS) -MF"./library/predict.d" -MT"./library/predict.d" -o ./library/predict.o ./library/predict.cpp
  
-share_headers.o: 
+./library/share_headers.o: ./library/share_headers.cpp ./library/share_headers.hpp
 	$(CC) -I$(INCLUDE) $(FLAGS) -MF"./library/share_headers.d" -MT"./library/share_headers.d" -o ./library/share_headers.o ./library/share_headers.cpp
  
-textclassifier.o: 
+./library/textclassifier.o: ./library/textclassifier.cpp ./library/textclassifier.h
 	$(CC) -I$(INCLUDE) $(FLAGS) -MF"./library/textclassifier.d" -MT"./library/textclassifier.d" -o ./library/textclassifier.o ./library/textclassifier.cpp
  
-train.o: 
+./library/train.o: ./library/train.cpp ./library/linear.hpp
 	$(CC) -I$(INCLUDE) $(FLAGS) -MF"./library/train.d" -MT"./library/train.d" -o ./library/train.o ./library/train.cpp
  
 clean:  
