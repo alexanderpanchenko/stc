@@ -126,7 +126,7 @@ On Ubuntu 11.10 or higher install (in addition to the packages indicated above)
 
 2. sudo apt-get install g++-multilib
 
-3. make.
+3. make
 
 Note: Alternatively to the make, you can build the sources in Eclipse. The Eclipse CDT projects are in library and client directories. Build in the Release mode.
 
