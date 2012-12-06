@@ -13,6 +13,7 @@
 #include <boost/regex.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/lexical_cast.hpp>
 #endif
 
 #include "linear.hpp"
@@ -79,8 +80,8 @@ private:
 	list<bool> text2vector(TextToClassify* texts, string output_file,
 		TextExpanderParams* exp_params,	bool is_unit_length=true);
 	void reconstruct_vector(string input_vector, string output_texts, string vocabulary_file);
-	bool text2xml(TextToClassify* texts, list<bool> has_data, list<int> labels, string output_file);
-	bool foo(TextToClassify* text, list<bool> hasdata, list<int> labels, string output_fpath);
+	bool text2xml(TextToClassify* texts, list<bool> has_data, list<pred> labels, string output_file);
+	//bool foo(TextToClassify* text, list<bool> hasdata, list<int> labels, string output_fpath);
 
 	TextToClassify* create_text();
 	TokenToClassify* create_token();

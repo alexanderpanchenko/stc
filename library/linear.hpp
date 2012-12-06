@@ -2,10 +2,15 @@
 #define _LIBLINEAR_H
 
 #include <list>
-
+#define DEFAULT_PROBABILITY 1.0
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+struct pred{
+	int category;
+	double probability;
+};
 
 struct feature_node
 {
@@ -78,9 +83,7 @@ int train_fs(const char* input_file_name, const char* model_file_name);
 #endif
 
 
-std::list<int> predict_fs(const char* vectors_file, const char* predict_file, struct model* classif_model);
-//void predict_fs(const char* vectors_file, const char* predict_file, struct model* classif_model);
-
+std::list<struct pred> predict_fs(const char* vectors_file, struct model* classif_model);
 
 #endif /* _LIBLINEAR_H */
 

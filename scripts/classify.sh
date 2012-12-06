@@ -29,4 +29,4 @@ cp $file $copy
 $stc -M p -i $copy -m $model/model -V $model/vocabulary.csv -s $model/stopwords.csv -c $model/stopos.csv -N u -r $model/relations.csv -E $expansion_max 
 
 # Remove the copy
-rm $copy
+#rm $copy

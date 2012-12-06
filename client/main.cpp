@@ -166,7 +166,7 @@ void print_message(char* format, ...){
 void help_message(char * fileName){
 	char E=27;
 	printf("%c[1m",E);
-	printf("STC: a Simple Text Classifier -- a command line tool for text classification.\n");
+	printf("STC: a Short Text Classifier -- a command line tool for text classification.\n");
 	printf("%c[0m",E);
 	printf("This tool can train a text classification model and apply it on a new text or a text collection.\n");
 	printf("\nUsage: %s [OPTIONS]\n", fileName);

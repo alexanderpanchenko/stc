@@ -171,11 +171,10 @@ void do_cross_validation()
 
 
 void set_default_params(){
-	int i;
 	void (*print_func)(const char*) = NULL;	// default printing to stdout
 
 	// default values
-	param.solver_type = L2R_L2LOSS_SVC_DUAL;
+	param.solver_type = L2R_LR;
 	param.C = 1;
 	param.eps = INF; // see setting below
 	param.nr_weight = 0;

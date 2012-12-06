@@ -13,7 +13,7 @@ struct feature_node *x;
 int max_nr_attr = 64;
 
 struct model* model_predict;
-int flag_predict_probability=0;
+int flag_predict_probability=1;
 
 void exit_input_error2(int line_num)
 {
@@ -42,8 +42,8 @@ static char* readline(FILE *input)
 	return line;
 }
 
-list<int> do_predict(FILE *input, FILE *output, struct model* model_predict){
-	list<int> labels_list;
+list<struct pred> do_predict(FILE *input, struct model* model_predict){
+	list<pred> labels_list;
 	int correct = 0;
 	int total = 0;
 
@@ -68,10 +68,6 @@ list<int> do_predict(FILE *input, FILE *output, struct model* model_predict){
 		labels=(int *) malloc(nr_class*sizeof(int));
 		get_labels(model_predict,labels);
 		prob_estimates = (double *) malloc(nr_class*sizeof(double));
-		fprintf(output,"labels");		
-		for(j=0;j<nr_class;j++)
-			fprintf(output," %d",labels[j]);
-		fprintf(output,"\n");
 		free(labels);
 	}
 
@@ -129,22 +125,24 @@ list<int> do_predict(FILE *input, FILE *output, struct model* model_predict){
 			i++;
 		}
 		x[i].index = -1;
-
+		
+		struct pred p;
 		if(flag_predict_probability)
 		{
-			int j;
 			predict_label = predict_probability(model_predict,x,prob_estimates);
-			fprintf(output,"%d",predict_label);
-			for(j=0;j<model_predict->nr_class;j++)
-				fprintf(output," %g",prob_estimates[j]);
-			fprintf(output,"\n");
+			double max_prob = 0;
+			for(int j=0;j<model_predict->nr_class;j++){
+				if(prob_estimates[j] > max_prob) max_prob = prob_estimates[j]; 					
+			}
+			p.probability = max_prob;
 		}
 		else
 		{
 			predict_label = predict(model_predict,x);
-			labels_list.push_back(predict_label);
-			fprintf(output,"%d\n",predict_label);
+			p.probability = DEFAULT_PROBABILITY;
 		}
+		p.category = predict_label;
+		labels_list.push_back(p);
 
 		if(predict_label == target_label)
 			++correct;
@@ -213,7 +211,7 @@ int predict_main(int argc, char **argv)
 	}
 
 	x = (struct feature_node *) malloc(max_nr_attr*sizeof(struct feature_node));
-	do_predict(input, output, model_predict);
+	do_predict(input, model_predict);
 	free_and_destroy_model(&model_predict);
 	free(line);
 	free(x);
@@ -222,65 +220,19 @@ int predict_main(int argc, char **argv)
 	return 0;
 }
 
-/*
-void predict_fs(const char* vectors_file, const char* predict_file, struct model* classif_model){
-//list<int> predict_fs(const char* vectors_file, const char* predict_file, struct model* classif_model){
-	// Initialize the parameters
-	list<int> labels_list;
-	FILE *input, *output;
-	input = fopen(vectors_file, "r");
-	if(input == NULL){
-		fprintf(stderr,"can't open input file %s\n", vectors_file);
-		//return labels_list;
-		return;
-	}
-
-	output = fopen(predict_file, "w");
-	if(output == NULL){
-		fprintf(stderr,"can't open output file %s\n", predict_file);
-		//return labels_list;
-		return;
-	}
-
-	if(classif_model == NULL){
-		fprintf(stderr,"classification model is not loaded\n");
-		//return labels_list;
-		return;
-	}
-	model_predict = classif_model;
-
-	// Predict the categories for the input data
-	x = (struct feature_node *) malloc(max_nr_attr*sizeof(struct feature_node));
-	labels_list = do_predict(input, output, model_predict);
-	//free_and_destroy_model(&model_predict);
-	free(line);
-	free(x);
-	fclose(input);
-	fclose(output);
-	//return labels_list;
-	return;
-}
-*/
 
 /**
  * Predicts the labels of texts
  * vectors_file 	Path to an input CSV file with vectors (one text per line) in LibSVM format
- * predict_file 	Path to the output file with predictions
  * model 			A model
  * */
-list<int> predict_fs(const char* vectors_file, const char* predict_file, struct model* classif_model){
+list<pred> predict_fs(const char* vectors_file, struct model* classif_model){
 	// Initialize the parameters
-	list<int> labels_list;
-	FILE *input, *output;
+	list<pred> labels_list;
+	FILE *input;
 	input = fopen(vectors_file, "r");
 	if(input == NULL){
 		fprintf(stderr,"can't open input file %s\n", vectors_file);
-		return labels_list;
-	}
-
-	output = fopen(predict_file, "w");
-	if(output == NULL){
-		fprintf(stderr,"can't open output file %s\n", predict_file);
 		return labels_list;
 	}
 
@@ -292,13 +244,11 @@ list<int> predict_fs(const char* vectors_file, const char* predict_file, struct 
 
 	// Predict the categories for the input data
 	x = (struct feature_node *) malloc(max_nr_attr*sizeof(struct feature_node));
-	labels_list = do_predict(input, output, model_predict);
+	labels_list = do_predict(input, model_predict);
 	free(line);
 	free(x);
 	fclose(input);
-	fclose(output);
 	return labels_list;
-
 }
 
 

@@ -15,7 +15,7 @@
 #define LEMMAS_TAG "lemmas"
 #define CLASS_ATT "class"
 #define CONFIDENCE_ATT "confidence"
-#define DEFAULT_CONFIDENCE_ATT "0.9"
+#define DEFAULT_CONFIDENCE_ATT "1.0"
 #define DEFAULT_UNKNOWN_CONFIDENCE_ATT "0.0"
 #define TOKEN_SEPARATOR "#"
 #define ID_ATT "id"
@@ -29,8 +29,10 @@
 #define NEGATIVE_CLASS_I -1
 
 // Other constants
-#define DELETE_TMP true
+
+#define DELETE_TMP false
 #define MIN_FEATURES_NUM 1 // Minimum number of features in a bag-of-words vector
+#define CLASS_NUM 2
 
 #include<string>
 #include <stdlib.h>

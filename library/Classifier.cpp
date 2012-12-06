@@ -266,17 +266,18 @@ list<bool> Classifier::text2vector(TextToClassify* text, string output_fpath,
 	int count = 0;
 	TokenToClassify* token;
 	BowVector* features;
-	FreqVocabulary relation_voc = _expander->get_vocabulary(); // Debug
+	//FreqVocabulary relation_voc = _expander->get_vocabulary(); // Debug
 	// Read texts
 	while(text){
-		//printf("\n\nText:%s\nFeatures:", text->sText); // Debug
+		//printf("\n\%s\n", text->sText); // Debug
 		// Convert tokens to a numerical vector
 		token = text->pToken;
 		features = new BowVector();
 		int token_id;
 
 		while(token){
-			printf("'%s', ", token->sLemma); // Debug
+			//printf(">>%s", token->sLemma); // Debug
+			//if(skip_token(token->sLemma)) cout << " (-)" << endl; // Debug
 			if(token->sLemma && !skip_token(token->sLemma)) {
 				string lemma(token->sLemma);
 				if(!_model_is_loaded){
@@ -287,25 +288,39 @@ list<bool> Classifier::text2vector(TextToClassify* text, string output_fpath,
 				}
 				else if(_vocabulary->exists(lemma)){
 					// Add token if it is in the vocabulary
+					//cout << " (@)" << endl ; //Debug
 					token_id = _vocabulary->get_word_id_ifexists(lemma);
 					features->increment_word(token_id);
 				}
 				else if(exp_params->max_expansions > 0){
-					// Add related words
+					// Try to add related words
 					list<long> projected_terms = _expander->get_projected_terms(lemma,  exp_params->max_expansions);
-					for(list<long>::iterator it = projected_terms.begin(); it != projected_terms.end(); it++) {
+					int i;
+					const int MAX_PROJ_NUM = 3;
+					list<long>::iterator it;
+					for(it = projected_terms.begin(), i = 0; it != projected_terms.end() && i < MAX_PROJ_NUM; it++, i++) {
 						features->increment_word(*it);
 					}
 
 					// Debug
-					cout << "expand" << endl;
-					if(projected_terms.size() > 0) cout << lemma << ":" << relation_voc.get_word_by_id_debug(*(projected_terms.begin())) << ":" << projected_terms.size() << endl;
-					cout << "\n>>>" << lemma << " = ";
-					for(list<long>::iterator it = projected_terms.begin(); it != projected_terms.end(); it++) {
-						cout << *it << ":" << relation_voc.get_word_by_id_debug(*it) << ", ";
+					/*
+					cout << " ("<< projected_terms.size() << ")";
+					if(projected_terms.size() > 0){
+						cout << " = ";
+						int i;
+						const int MAX_PROJ_NUM = 3;
+						list<long>::iterator it;
+						for(it = projected_terms.begin(), i = 0; it != projected_terms.end() && i < MAX_PROJ_NUM; it++, i++) {
+							//cout << *it << ":" << relation_voc.get_word_by_id_debug(*it) << "; ";
+							cout << relation_voc.get_word_by_id_debug(*it) << "; ";
+						}
 					}
-					cout << "." << endl;
+					cout << endl;
+					*/
 				}
+				//else{ // Debug
+				//	cout << "(0)" << endl; //Debug
+				//} // Debug
 			}
 			token = token->pNext;
 		}
@@ -479,7 +494,7 @@ bool Classifier::train(string input_file, bool is_unit_length) {
 	return result;
 }
 
-bool Classifier::predict(TextToClassify* texts, string output_file, TextExpanderParams* exp_params,	bool is_unit_length) {
+bool Classifier::predict(TextToClassify* texts, string output_file, TextExpanderParams* exp_params, bool is_unit_length) {
 	if(_verbose) printf("Predicting...\n");
 
 	if(!_model_is_loaded){
@@ -499,16 +514,12 @@ bool Classifier::predict(TextToClassify* texts, string output_file, TextExpander
 		return false;
 	}
 
-	string predict_file = output_file + ".predict";
-	list<int> labels = predict_fs(vectors_file.c_str(), predict_file.c_str(), this->_model);
+	list<pred> labels = predict_fs(vectors_file.c_str(), this->_model);
 	text2xml(texts, has_data, labels, output_file);
 
 	if(DELETE_TMP){
 		wpath vectors_path(vectors_file);
 		if(exists(vectors_path)) remove(vectors_path);
-
-		wpath predict_path(predict_file);
-		if(exists(predict_path)) remove(predict_path);
 	}
 }
 
@@ -530,11 +541,6 @@ bool Classifier::predict(string input_file, string output_file, TextExpanderPara
 	return result;
 }
 
-
-bool Classifier::foo(TextToClassify* text, list<bool> hasdata, list<int> labels, string output_fpath){
-	return true;
-
-}
 
 /**
  * Predicts values of the new data file. The output classification is saved
@@ -562,8 +568,7 @@ bool Classifier::predict(string input_file, TextExpanderParams* exp_params,  boo
 	}
 
 	// Predict labels of the texts
-	string predict_file = input_file + ".predict";
-	list<int> labels = predict_fs(vectors_file.c_str(), predict_file.c_str(), this->_model);
+	list<pred> labels = predict_fs(vectors_file.c_str(), this->_model);
 
 	// Delete input file
 	string input_file_copy(input_file); // Bug: string destroyed after remove
@@ -575,8 +580,6 @@ bool Classifier::predict(string input_file, TextExpanderParams* exp_params,  boo
 	if(DELETE_TMP){
 		wpath vectors_path(vectors_file);
 		if(exists(vectors_path)) remove(vectors_path);
-		wpath predict_path(predict_file);
-		if(exists(predict_path)) remove(predict_path);
 	}
 
 	// Delete texts
@@ -591,7 +594,7 @@ bool Classifier::predict(string input_file, TextExpanderParams* exp_params,  boo
  * assign class labels {-1, 0, +1}
  * */
 bool Classifier::text2xml(TextToClassify* text, list<bool> hasdata,
-		list<int> labels, string output_fpath) {
+		list<pred> labels, string output_fpath) {
 
 	// Get the number of texts
 	TextToClassify* first_text = text;
@@ -618,20 +621,20 @@ bool Classifier::text2xml(TextToClassify* text, list<bool> hasdata,
 		const char* original_text;
 		string lemmas_text;
 		int label;
-		string confidence;
+		double confidence;
 		int text_num = 1;
 		text = first_text;
-		list<int>::iterator labels_it = labels.begin();
+		list<pred>::iterator labels_it = labels.begin();
 		list<bool>::iterator hasdata_it = hasdata.begin();
 
 		fprintf(output_file, "<%s>\n", ROOT_TAG);
 		while(text && labels_it != labels.end() && hasdata_it != hasdata.end()){
-			label = (*hasdata_it ? *labels_it : NEGATIVE_CLASS_I);
-			confidence = (*hasdata_it ? DEFAULT_CONFIDENCE_ATT : DEFAULT_UNKNOWN_CONFIDENCE_ATT );
-			fprintf(output_file, "<%s %s='%d' %s='%s' %s='%s'>\n",
+			label = (*hasdata_it ? (*labels_it).category : NEGATIVE_CLASS_I);
+			confidence = (*hasdata_it ? (*labels_it).probability : 0);
+			fprintf(output_file, "<%s %s='%d' %s='%s' %s='%0.4f'>\n",
 					TEXT_TAG, ID_ATT, (texts_has_no_id ? text_num : text->iID),
 					CLASS_ATT, get_label_name(label).c_str(),
-					CONFIDENCE_ATT, confidence.c_str());
+					CONFIDENCE_ATT, confidence);
 
 			original_text = (text->sText ? text->sText : "");
 			fprintf(output_file, "<%s>%s</%s>\n", ORIGINAL_TAG, original_text, ORIGINAL_TAG);

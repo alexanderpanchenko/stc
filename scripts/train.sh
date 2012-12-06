@@ -1,8 +1,6 @@
 #!/bin/bash
 
-# This script applies a model trained on galleries/wikipedia to a new file
-
-# Process the command line arguments
+# Process the parameters
 if [ $# -lt 1 ] ; then
 	echo "This script trains a new classifier"
 	echo "Usage: train.sh <model-dir>"  
@@ -11,11 +9,12 @@ if [ $# -lt 1 ] ; then
 fi
 model=$1
 
-# Set the paths to the data and the programs
-icop=~/work/active/icop/src/icop-console/Release/stc
+# Constants
+icop=./../bin/stc
+verbose="-v true" # to quite use "", not "-v false"
 
-# Classify the copy of the file
+# Train 
 $icop -M t -i $model/train.xml -m $model/model -V $model/vocabulary.csv -s $model/stopwords.csv -c $model/stopos.csv -N u -r $model/relations.csv 
 
-# Apply the model on the validation set
+# Validate
 ./classify.sh $model/valid.xml $model
