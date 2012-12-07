@@ -174,7 +174,7 @@ void set_default_params(){
 	void (*print_func)(const char*) = NULL;	// default printing to stdout
 
 	// default values
-	param.solver_type = L2R_LR;
+	param.solver_type = L2R_LR; //L2R_LR_DUAL;//L1R_LR;//
 	param.C = 1;
 	param.eps = INF; // see setting below
 	param.nr_weight = 0;
