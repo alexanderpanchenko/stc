@@ -2,7 +2,7 @@ Training data and the ready to use models can be downloaded from http://cental.f
 Download this archive and extract to this directory:
 
 ```
-wget http://cental.fltr.ucl.ac.be/team/panchenko/stc/data.tgz && tar xzf data.tgz
+wget http://cental.fltr.ucl.ac.be/team/panchenko/stc/data.tgz && tar xzf data.tgz && rm -f data.tgz
 ```
 
 The archive contains several models:
