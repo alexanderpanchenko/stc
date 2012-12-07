@@ -1,5 +1,0 @@
-Gallery dataset:
- - positive examples are titles of web porn galleries
- - negative examples are titles of wikipedia articles
- - the number of positives and negatives is roughtly equal
- - the model was trained on the "train" part only
