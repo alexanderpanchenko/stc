@@ -92,14 +92,13 @@ Options:
 
 **Usage of the library**
 
-3. Link your C/C++ program to libshort_text_classifier.so. Directory client-sample contains an example of a C program linked to the library (see makefile in Debug directory). You can open client-sample with Eclipse CDT or compile it with the provided makefile. 
+3. Link your C/C++ program to *libshort_text_classifier.so*. Directory client-sample contains an example of a C program linked to the library (see makefile in Debug directory). You can open client-sample with Eclipse CDT or compile it with the provided makefile. 
 
-4. Copy textclassifier.h and iniparam.h to your include directory.
+4. Copy *textclassifier.h* and *iniparam.h* to your include directory.
 
-5. Include textclassifier.h file in your C/C++ program.
+5. Include *textclassifier.h* file in your C/C++ program.
 
-6. Use functions defined textclassifier.h to manipulate the classifier (see the
-header for the documentation). An example of library usage:
+6. Use functions defined *textclassifier.h* to manipulate the classifier (see the header for the documentation). An example of library usage:
 
 ```
 IniParam* ip = get_iniparam();
@@ -120,7 +119,7 @@ TextClassifier_Destroy(cm);
 ```
 **Recompilation**
 
-On Ubuntu 11.10 or higher install (in addition to the packages indicated above)
+On Ubuntu 11.10 or higher install in addition to the packages indicated above:
 
 1. sudo apt-get install libc6-dev-i386
 

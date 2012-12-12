@@ -22,8 +22,8 @@ stc: ./client/main.o ./bin/libshort_text_classifier.so
 #####################
 # The shared library  
 
-./bin/libshort_text_classifier.so: ./library/BowVector.o ./library/Classifier.o ./library/ClassifierManager.o ./library/FreqVocabulary.o ./library/TextExpander.o ./library/Vocabulary.o ./library/classifier_c.o ./library/predict.o ./library/share_headers.o ./library/textclassifier.o ./library/train.o 
-	$(CC) -L./bin -shared -o ./bin/libshort_text_classifier.so ./library/BowVector.o ./library/Classifier.o ./library/ClassifierManager.o ./library/FreqVocabulary.o ./library/TextExpander.o ./library/Vocabulary.o ./library/classifier_c.o ./library/predict.o ./library/share_headers.o ./library/textclassifier.o ./library/train.o -lboost_regex -lboost_system -lboost_filesystem -llinear
+./bin/libshort_text_classifier.so: ./library/BowVector.o ./library/Classifier.o ./library/ClassifierManager.o ./library/FreqVocabulary.o ./library/TextExpander.o ./library/Vocabulary.o ./library/predict.o ./library/share_headers.o ./library/textclassifier.o ./library/train.o 
+	$(CC) -L./bin -shared -o ./bin/libshort_text_classifier.so ./library/BowVector.o ./library/Classifier.o ./library/ClassifierManager.o ./library/FreqVocabulary.o ./library/TextExpander.o ./library/Vocabulary.o ./library/predict.o ./library/share_headers.o ./library/textclassifier.o ./library/train.o -lboost_regex -lboost_system -lboost_filesystem -llinear
 
 ./library/BowVector.o:  ./library/BowVector.cpp ./library/BowVector.hpp ./library/share_headers.hpp
 	$(CC) -I$(INCLUDE) $(FLAGS) -MF"./library/BowVector.d" -MT"./library/BowVector.d" -o ./library/BowVector.o ./library/BowVector.cpp
@@ -43,9 +43,6 @@ stc: ./client/main.o ./bin/libshort_text_classifier.so
 ./library/Vocabulary.o: ./library/Vocabulary.cpp ./library/Vocabulary.hpp ./library/share_headers.hpp
 	$(CC) -I$(INCLUDE) $(FLAGS) -MF"./library/Vocabulary.d" -MT"./library/Vocabulary.d" -o ./library/Vocabulary.o ./library/Vocabulary.cpp
 
-./library/classifier_c.o: ./library/classifier_c.cpp ./library/classifier_c.h ./library/share_headers.hpp
-	$(CC) -I$(INCLUDE) $(FLAGS) -MF"./library/classifier_c.d" -MT"./library/classifier_c.d" -o ./library/classifier_c.o ./library/classifier_c.cpp
- 
 ./library/predict.o: ./library/predict.cpp ./library/linear.hpp ./library/share_headers.hpp
 	$(CC) -I$(INCLUDE) $(FLAGS) -MF"./library/predict.d" -MT"./library/predict.d" -o ./library/predict.o ./library/predict.cpp
  
