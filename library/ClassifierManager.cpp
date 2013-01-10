@@ -14,24 +14,14 @@ using namespace boost;
  * number of the model.
  * */
 ClassifierManager::ClassifierManager(string resources_dir, bool verbose) {
-	this->_resources_dir = resources_dir;
-	this->_verbose = verbose;
-	this->_models_loaded = load_models(resources_dir, verbose);
-	if (!this->_models_loaded){
+	_resources_dir = resources_dir;
+	_verbose = verbose;
+	_models_loaded = load_models(resources_dir, verbose);
+	if (!_models_loaded){
 		printf("Error: loading of the models failed.");
 	}
-	this->_default_expansion_params = new TextExpanderParams();
+	_default_expansion_params = new TextExpanderParams();
 }
-
-/*
-ClassifierManager::ClassifierManager(IniParam* params) {
-	this->_models_loaded = load_models(params);
-	if (!this->_models_loaded){
-		printf("Error: loading of the models failed.");
-	}
-	this->_default_expansion_params = new TextExpanderParams();
-}
-*/
 
 ClassifierManager::~ClassifierManager() {
 	unload_models();
@@ -50,7 +40,7 @@ bool ClassifierManager::unload_models() {
 }
 
 bool ClassifierManager::predict(int model_id, TextToClassify* text,	string output_file) {
-	return predict(model_id, text, output_file, this->_default_expansion_params, true);
+	return predict(model_id, text, output_file, _default_expansion_params, true);
 }
 
 
@@ -100,7 +90,7 @@ int ClassifierManager::add_model(TextToClassify* text, bool is_unit_length) {
 	_classifiers.insert(make_pair(model_id, classifier));
 
 	if(!train(model_id, text, is_unit_length)){
-		printf("Error: the model '%s' was not trained.\n");
+		printf("Error: the model '%d' was not trained.\n", model_id);
 		return -1;
 	}
 	return model_id;
@@ -253,7 +243,7 @@ Classifier* ClassifierManager::get(int model_id) {
 bool ClassifierManager::predict(int model_id, TextToClassify* text,
 	string output_file, TextExpanderParams* exp_params, bool is_unit_length)
 {
-	if(!this->_models_loaded){
+	if(!_models_loaded){
 		printf("Error: no model is loaded. Load the models first.\n");
 		return false;
 	}
@@ -269,7 +259,7 @@ bool ClassifierManager::predict(int model_id, TextToClassify* text,
 }
 
 bool ClassifierManager::train(int model_id, TextToClassify* text, bool is_unit_length) {
-	if(!this->_models_loaded){
+	if(!_models_loaded){
 		printf("Error: no model is loaded. Load the models first even if you need to train a new model. The model should be pre-loaded before training.\n");
 		return false;
 	}
@@ -286,29 +276,19 @@ bool ClassifierManager::train(int model_id, TextToClassify* text, bool is_unit_l
 
 bool ClassifierManager::reload(string resources_dir, bool verbose) {
 	unload_models();
-	this->_models_loaded = load_models(resources_dir, verbose);
-	if (!this->_models_loaded){
+	_models_loaded = load_models(resources_dir, verbose);
+	if (!_models_loaded){
 		printf("Error: loading of the models failed.");
 	}
 	return true;
 }
 
-/*
-bool ClassifierManager::reload(IniParam* params) {
-	unload_models();
-	this->_models_loaded = load_models(params);
-	if (!this->_models_loaded){
-		printf("Error: loading of the models failed.");
-	}
-	return true;
-}
-*/
 int ClassifierManager::get_models_num() {
-	return this->_classifiers.size();
+	return _classifiers.size();
 }
 
 int* ClassifierManager::get_model_ids() {
-	int* model_ids = new int[this->_classifiers.size()];
+	int* model_ids = new int[_classifiers.size()];
 	map<int,Classifier*>::iterator it;
 	int i = 0;
 	for(it = _classifiers.begin(); it != _classifiers.end(); it++) {
@@ -329,57 +309,3 @@ void ClassifierManager::print_models_info() {
 			it->second->get_vocabulary_file().c_str(), it->second->get_model_file().c_str());
 	}
 }
-
-/**
- * Parses the ini file key in the format "KEY_MODELID" and returns
- * int = MODELID, such as "1"
- * string = KEY, such as "STOPWORDS"
- * */
-/*
-pair<int, string> ClassifierManager::parse_ini_key(char* ini_key) {
-	pair<int,string> ini_pair;
-	ini_pair.first = -1;
-	ini_pair.second = "";
-
-	if(ini_key){
-		char key[100];
-		int id;
-		string format = "%[a-zA-Z]";
-		format += INI_SEPARATOR;
-		format += "%d";
-
-		sscanf(ini_key, format.c_str(), key, &id);
-		ini_pair.first = id;
-		ini_pair.second = string(key);
-	}
-
-	return ini_pair;
-}
-*/
-
-/**
- * Parse the ini params structure
- * int = model_id
- * string = param_key
- * string = param_value
- * */
-/*
-map<int, map<string,string> > ClassifierManager::parse_ini_params(IniParam* ini_params){
-	map<int, map<string,string> > params;
-	while(ini_params){
-		if(ini_params->sKey && ini_params->sVal){
-			pair<int,string> p = parse_ini_key(ini_params->sKey);
-			string value(ini_params->sVal);
-
-		if(p.first >= 0 && p.second != "" && value != ""){
-			map<int,map<string, string> >::iterator it = params.find(p.first);
-			if(it == params.end()) params.insert(make_pair(p.first, map<string,string>()));
-				params[p.first].insert(make_pair(p.second, value));
-			}
-		}
-
-		ini_params = ini_params->pNext;
-	}
-	return params;
-}
-*/

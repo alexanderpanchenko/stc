@@ -10,40 +10,39 @@ VERBOSE = verbose;
 
 	// Ensure that vocabulary is correctly initialized
 	if(classifier_vocabulary.size() > 0){
-		this->_relations_vocabulary = classifier_vocabulary;
+		_relations_vocabulary = classifier_vocabulary;
 	}
 	else{
-		this->_relations_vocabulary = new FreqVocabulary();
+		_relations_vocabulary = new FreqVocabulary();
 		printf("Error: vocabulary was not loaded.\n");
 		return;
 	}
 
 	// Load semantic relations from the file
 	load_relations(relations_file);
-	//this->vocabulary = _relations_vocabulary;
 }
+
+TextExpander::~TextExpander() { }
 
 void TextExpander::print_relations() {
 	map<long, list<long> >::iterator it;
-	for (it = this->begin(); it != this->end(); it++){
-		printf("%d:%s =", it->first, _relations_vocabulary.get_word_by_id_debug(it->first).c_str());
+	for (it = begin(); it != end(); it++){
+		printf("%ld:%s =", it->first, _relations_vocabulary.get_word_by_id_debug(it->first).c_str());
 		list<long>::iterator lit;
 
 		for (lit = it->second.begin(); lit != it->second.end(); lit++){
-			printf(" %d:%s", *lit, _relations_vocabulary.get_word_by_id_debug(*lit).c_str());
+			printf(" %ld:%s", *lit, _relations_vocabulary.get_word_by_id_debug(*lit).c_str());
 		}
 		printf("\n\n");
 	}
 }
 
-
-
 /**
  * Perform an expansion for a given term with max_expansion terms
  * */
 list<long> TextExpander::get_related_terms(long term_id) {
-	map<long, list<long> >::iterator it = this->find(term_id);
-	if(it != this->end())
+	map<long, list<long> >::iterator it = find(term_id);
+	if(it != end())
 		return (*it).second;
 	list<long> void_list;
 	return void_list;
@@ -165,15 +164,10 @@ BowVector* TextExpander::enrich_vector(BowVector* original_vector, int max_expan
 		return original_vector;
 }
 
-
-TextExpander::~TextExpander() {
-
-}
-
 /**
-   * Loading relations from a CSV file "term;related-term;\n".
-    * The relatum terms of each target should be sorted by relevance.
-     * */
+ * Loading relations from a CSV file "term;related-term;\n".
+ * The relatum terms of each target should be sorted by relevance.
+ * */
 void TextExpander::load_relations(string relations_file) {
 	if (VERBOSE) printf("Loading relations file: %s...\n", relations_file.c_str());
 
@@ -208,23 +202,23 @@ void TextExpander::load_relations(string relations_file) {
 		}
 
 		//Add the relation
-		if (this->find(id_target) == this->end()){
+		if (find(id_target) == end()){
 			list<long> l;// new list<long>()
-			this->insert(make_pair(id_target, l));
+			insert(make_pair(id_target, l));
 		}
-		this->find(id_target)->second.push_back(id_relatum);
+		find(id_target)->second.push_back(id_relatum);
 		relations_count++;
 
 		// Read next line
 		getline(relations_stm, line);
 	}
-	printf("%d relations were loaded\n", relations_count);
+	printf("%ld relations were loaded\n", relations_count);
 	return;
 }
 
 void TextExpander::print_id_list(list<long> id_list) {
 	for (list<long>::iterator it = id_list.begin(); it != id_list.end(); it++){
-	    printf("%d; ", (*it));
+	    printf("%ld; ", (*it));
 	}
 	printf("\n");
 }
@@ -239,7 +233,7 @@ void TextExpander::print_term_list(list<string> term_list) {
 void TextExpander::print_vector(BowVector* text_vector) {
 	// For each word-id map to the term
 	for (map<long,long>::iterator it = text_vector->begin(); it != text_vector->end(); it++){
-		printf("%s:%d, ", _relations_vocabulary.get_word_by_id_debug(it->first).c_str(), it->second);
+		printf("%s:%ld, ", _relations_vocabulary.get_word_by_id_debug(it->first).c_str(), it->second);
 	}
 	printf("\n");
 }
@@ -264,6 +258,3 @@ list<long> TextExpander::get_projected_terms(string term, int max_related_terms)
 	}
 	return related;
 }
-
-
-

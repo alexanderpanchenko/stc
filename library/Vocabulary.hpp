@@ -11,11 +11,7 @@
 
 #include "share_headers.hpp"
 
-#pragma once
-
 using namespace std;
-
-//extern GlobalArgs params;
 
 /*
  * Class stores list of terms loaded from a CSV file "term\n"

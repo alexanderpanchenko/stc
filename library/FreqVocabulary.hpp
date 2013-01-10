@@ -11,8 +11,6 @@
 
 #include "share_headers.hpp"
 
-#pragma once
-
 using namespace std;
 
 /*

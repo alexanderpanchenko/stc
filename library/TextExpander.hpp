@@ -1,8 +1,6 @@
 #ifndef TEXTEXPANDER_H_
 #define TEXTEXPANDER_H_
 
-#pragma once
-
 #include <map>
 #include <list>
 #include <iostream>

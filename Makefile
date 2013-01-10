@@ -16,7 +16,7 @@ all: stc
 
 stc: ./client/main.o ./bin/libshort_text_classifier.so
 	$(CC) -L./bin -o ./bin/stc ./client/main.o -lshort_text_classifier 
-./client/main.o: 
+./client/main.o: ./client/main.cpp 
 	$(CC) -I./library -O3 -Wall -c -fmessage-length=0 -MMD -MP -MF"./client/main.d" -MT"./client/main.d" -o ./client/main.o ./client/main.cpp 
 
 #####################

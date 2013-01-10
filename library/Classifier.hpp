@@ -14,6 +14,8 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
+#include <rapidxml.hpp>
+#include <rapidxml_print.hpp>
 #endif
 
 #include "linear.hpp"
@@ -22,15 +24,11 @@
 #include "BowVector.hpp"
 #include "TextExpander.hpp"
 #include "share_headers.hpp"
-#include "rapidxml.hpp"
-#include "rapidxml_print.hpp"
 #include "textclassifier.h"
 
-#pragma once
-
 using namespace std;
-using namespace rapidxml;
 #ifndef CLIENT
+using namespace rapidxml;
 using namespace boost;
 using namespace boost::filesystem;
 #endif
@@ -76,12 +74,10 @@ private:
 	FreqVocabulary* _vocabulary;
 	TextExpander* _expander;
 	bool skip_token(string token);
-	feature_node* generate_feature_node(int size);
 	list<bool> text2vector(TextToClassify* texts, string output_file,
 		TextExpanderParams* exp_params,	bool is_unit_length=true);
 	void reconstruct_vector(string input_vector, string output_texts, string vocabulary_file);
 	bool text2xml(TextToClassify* texts, list<bool> has_data, list<pred> labels, string output_file);
-	//bool foo(TextToClassify* text, list<bool> hasdata, list<int> labels, string output_fpath);
 
 	TextToClassify* create_text();
 	TokenToClassify* create_token();
@@ -92,8 +88,6 @@ private:
 	bool load_train_resources();
 	bool load_predict_resources();
 	void unload_predict_resources();
-
-	//bool insert_labels(string xml_file, list<int> labels, list<bool> has_data);
 };
 
 #endif /* FEATUREEXTRACTOR_H_ */

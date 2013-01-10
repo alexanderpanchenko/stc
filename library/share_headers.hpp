@@ -39,7 +39,7 @@
 #include <stdio.h>
 using namespace std;
 // For file_exist functions
-bool file_exists(char* fileName, bool silent);
+bool file_exists(const char* fileName, bool silent);
 bool file_exists(std::string fileName, bool silent);
 std::string get_label_name(int label);
 

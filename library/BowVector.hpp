@@ -10,8 +10,6 @@
 
 #include "share_headers.hpp"
 
-#pragma once
-
 using namespace std;
 
 /**
@@ -30,7 +28,5 @@ public:
 private:
 	double get_norm(void);
 };
-
-void test_bowvector(void);
 
 #endif /* BOWVECTOR_H_ */

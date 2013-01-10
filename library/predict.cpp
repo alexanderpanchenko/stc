@@ -49,7 +49,7 @@ list<struct pred> do_predict(FILE *input, struct model* model_predict){
 
 	int nr_class=get_nr_class(model_predict);
 	double *prob_estimates=NULL;
-	int j, n;
+	int n;
 	int nr_feature=get_nr_feature(model_predict);
 	if(model_predict->bias>=0)
 		n=nr_feature+1;

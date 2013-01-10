@@ -6,6 +6,8 @@ Vocabulary::Vocabulary(string file, bool verbose) {
 		printf("Error: vocabulary file %s was not loaded correctly.", file.c_str());
 }
 
+Vocabulary::~Vocabulary() { }
+
 /**
  * Loads vocabulary from a CSV file "term\n"
  * */
@@ -22,15 +24,15 @@ bool Vocabulary::load(string voc_file) {
 	getline(voc_stm, term);
 	while (voc_stm) {
 		// Add an entry
-		id = this->size();
-		this->insert(make_pair(term, id));
+		id = size();
+		insert(make_pair(term, id));
 		//if (globalArgs.verbose) cout << term << "," << id << endl;
 
 		// Read next line
 		getline(voc_stm, term);
 	}
 
-	if (VERBOSE) printf("%d words were loaded\n", this->size());
+	if (VERBOSE) printf("%d words were loaded\n", size());
 	return true;
 }
 
@@ -38,21 +40,18 @@ bool Vocabulary::load(string voc_file) {
  * Check if the word is in the vocabulary
  * */
 bool Vocabulary::contains(string word) {
-	map<string, long>::iterator it = this->find(word);
-	return (it != this->end());
+	map<string, long>::iterator it = find(word);
+	return (it != end());
 }
 
 /**
  * Finds ID of a word
  * */
 long Vocabulary::get_word_id(string word) {
-	map<string, long>::iterator it = this->find(word);
-	if (it != this->end()) return (*it).second;
+	map<string, long>::iterator it = find(word);
+	if (it != end()) return (*it).second;
 	else return -1;
 }
-
-
-Vocabulary::~Vocabulary() { }
 
 void test_simple_vocabulary(void) {
 	Vocabulary* voc = new Vocabulary("/home/sasha/work/data/test/stopwords.csv");
@@ -63,5 +62,3 @@ void test_simple_vocabulary(void) {
 
 	delete voc;
 }
-
-

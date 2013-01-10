@@ -12,6 +12,8 @@ FreqVocabulary::FreqVocabulary(string vocFile, bool verbose) {
 		cout << "Error: can not load file " << vocFile << endl;
 }
 
+FreqVocabulary::~FreqVocabulary() { }
+
 /**
  * Loads vocabulary from a CSV file "term;id;frequency;"
  * */
@@ -46,16 +48,14 @@ bool FreqVocabulary::load(string voc_file) {
 		if (!getline(iss, tmp, ';')) break;
 		freq = atoi(tmp.c_str());
 
-		//if (VERBOSE) cout << term << "," << id << "," << freq << endl;
-
 		// Add an entry
-		this->insert(make_pair(term, make_pair(id, freq)));
+		insert(make_pair(term, make_pair(id, freq)));
 
 		// Read next line
 		getline(voc_stm, line);
 	}
 
-	if(VERBOSE) printf("%d terms were loaded\n", this->size());
+	if(VERBOSE) printf("%d terms were loaded\n", size());
 	return true;
 }
 
@@ -70,8 +70,8 @@ bool FreqVocabulary::save(string voc_file) {
 
 	// Write all entries to the file
 	map<string, pair<long, long> >::iterator it;
-	for (it = this->begin(); it != this->end(); it++) {
-		fprintf(f, "%s;%d;%d;\n", (*it).first.c_str(), (*it).second.first,
+	for (it = begin(); it != end(); it++) {
+		fprintf(f, "%s;%ld;%ld;\n", (*it).first.c_str(), (*it).second.first,
 				(*it).second.second);
 	}
 
@@ -92,8 +92,8 @@ long FreqVocabulary::get_word_id(string word) {
 }
 
 bool FreqVocabulary::exists(string word) {
-	map<string, pair<long, long> >::iterator it = this->find(word);
-	return it != this->end();
+	map<string, pair<long, long> >::iterator it = find(word);
+	return it != end();
 }
 
 /**
@@ -102,8 +102,8 @@ bool FreqVocabulary::exists(string word) {
  * */
 long FreqVocabulary::get_word_id_ifexists(string word) {
 	map<string, pair<long, long> >::iterator it;
-	it = this->find(word);
-	if (it != this->end()) {
+	it = find(word);
+	if (it != end()) {
 		pair<long, long> info = (*it).second;
 		return info.first;
 	}
@@ -117,8 +117,8 @@ pair<long, long> FreqVocabulary::get_word_info(string word) {
 
 	// Try to find existing entry
 	map<string, pair<long, long> >::iterator it;
-	it = this->find(word);
-	if (it != this->end()) {
+	it = find(word);
+	if (it != end()) {
 		info = (*it).second;
 	}
 	// Create new entry
@@ -133,11 +133,11 @@ void FreqVocabulary::print_contents(void) {
 	if (VERBOSE)
 		printf("Contents of the vocabulary:");
 	map<string, pair<long, long> >::iterator it;
-	for (it = this->begin(); it != this->end(); it++) {
+	for (it = begin(); it != end(); it++) {
 		cout << it->first << ";" << it->second.first << ";" << it->second.second
 				<< endl;
 	}
-	cout << "Contains " << this->size() << " elements" << endl;
+	cout << "Contains " << size() << " elements" << endl;
 }
 
 /**
@@ -146,7 +146,7 @@ void FreqVocabulary::print_contents(void) {
  * */
 string FreqVocabulary::get_word_by_id_debug(long id) {
 	map<string, pair<long,long> >::const_iterator it;
-	for (it = this->begin(); it != this->end(); ++it){
+	for (it = begin(); it != end(); ++it){
 		if (it->second.first == id){
 			return it->first;
 		}
@@ -156,19 +156,19 @@ string FreqVocabulary::get_word_by_id_debug(long id) {
 
 
 pair<long, long> FreqVocabulary::add_word(string word, bool negative_id) {
-	long id = (long) this->size() + 1;
+	long id = (long) size() + 1;
 	if(negative_id) id = -id;
 	long freq = 1;
 	pair<long, long> info = make_pair(id, freq);
-	this->insert(make_pair(word, info));
+	insert(make_pair(word, info));
 
 	return info;
 }
 
 bool FreqVocabulary::increment_word(string word) {
 	map<string, pair<long, long> >::iterator it;
-	it = this->find(word);
-	if (it != this->end()) {
+	it = find(word);
+	if (it != end()) {
 		(*it).second.second++;
 	}
 	// Create new entry
@@ -178,130 +178,4 @@ bool FreqVocabulary::increment_word(string word) {
 
 	return true;
 }
-
-FreqVocabulary::~FreqVocabulary() { }
-
-void vocabulary_test(void) {
-	FreqVocabulary* voc = new FreqVocabulary();
-
-	string w1 = "a";
-	printf("%s id=%d, freq=%d\n", w1.c_str(), voc->get_word_id(w1),
-			voc->get_word_info(w1).second);
-	voc->increment_word(w1);
-
-	w1 = "a";
-	printf("%s id=%d, freq=%d\n", w1.c_str(), voc->get_word_id(w1),
-			voc->get_word_info(w1).second);
-	voc->increment_word(w1);
-	w1 = "a";
-	printf("%s id=%d, freq=%d\n", w1.c_str(), voc->get_word_id(w1),
-			voc->get_word_info(w1).second);
-	voc->increment_word(w1);
-	w1 = "a";
-	printf("%s id=%d, freq=%d\n", w1.c_str(), voc->get_word_id(w1),
-			voc->get_word_info(w1).second);
-	voc->increment_word(w1);
-	w1 = "a";
-	printf("%s id=%d, freq=%d\n", w1.c_str(), voc->get_word_id(w1),
-			voc->get_word_info(w1).second);
-	voc->increment_word(w1);
-	w1 = "a";
-	printf("%s id=%d, freq=%d\n", w1.c_str(), voc->get_word_id(w1),
-			voc->get_word_info(w1).second);
-	voc->increment_word(w1);
-	w1 = "a";
-	printf("%s id=%d, freq=%d\n", w1.c_str(), voc->get_word_id(w1),
-			voc->get_word_info(w1).second);
-	voc->increment_word(w1);
-	w1 = "a";
-	printf("%s id=%d, freq=%d\n", w1.c_str(), voc->get_word_id(w1),
-			voc->get_word_info(w1).second);
-	voc->increment_word(w1);
-	w1 = "b";
-	printf("%s id=%d, freq=%d\n", w1.c_str(), voc->get_word_id(w1),
-			voc->get_word_info(w1).second);
-	voc->increment_word(w1);
-	w1 = "c";
-	printf("%s id=%d, freq=%d\n", w1.c_str(), voc->get_word_id(w1),
-			voc->get_word_info(w1).second);
-	voc->increment_word(w1);
-	w1 = "d";
-	printf("%s id=%d, freq=%d\n", w1.c_str(), voc->get_word_id(w1),
-			voc->get_word_info(w1).second);
-	voc->increment_word(w1);
-	w1 = "e";
-	printf("%s id=%d, freq=%d\n", w1.c_str(), voc->get_word_id(w1),
-			voc->get_word_info(w1).second);
-	voc->increment_word(w1);
-	w1 = "a";
-	printf("%s id=%d, freq=%d\n", w1.c_str(), voc->get_word_id(w1),
-			voc->get_word_info(w1).second);
-	voc->increment_word(w1);
-	w1 = "a";
-	printf("%s id=%d, freq=%d\n", w1.c_str(), voc->get_word_id(w1),
-			voc->get_word_info(w1).second);
-	voc->increment_word(w1);
-	w1 = "a";
-	printf("%s id=%d, freq=%d\n", w1.c_str(), voc->get_word_id(w1),
-			voc->get_word_info(w1).second);
-	voc->increment_word(w1);
-	w1 = "w";
-	printf("%s id=%d, freq=%d\n", w1.c_str(), voc->get_word_id(w1),
-			voc->get_word_info(w1).second);
-	voc->increment_word(w1);
-	w1 = "b";
-	printf("%s id=%d, freq=%d\n", w1.c_str(), voc->get_word_id(w1),
-			voc->get_word_info(w1).second);
-	voc->increment_word(w1);
-	w1 = "e";
-	printf("%s id=%d, freq=%d\n", w1.c_str(), voc->get_word_id(w1),
-			voc->get_word_info(w1).second);
-	voc->increment_word(w1);
-	voc->save("/home/sasha/work/data/test/filenames-voc.csv");
-
-	delete voc;
-
-	voc = new FreqVocabulary();
-	voc->load("/home/sasha/work/data/test/filenames-voc.csv");
-
-	printf("%s id=%d, freq=%d\n", w1.c_str(), voc->get_word_id(w1),
-			voc->get_word_info(w1).second);
-	printf("%s id=%d, freq=%d\n", w1.c_str(), voc->get_word_id(w1),
-			voc->get_word_info(w1).second);
-	printf("%s id=%d, freq=%d\n", w1.c_str(), voc->get_word_id(w1),
-			voc->get_word_info(w1).second);
-	printf("%s id=%d, freq=%d\n", w1.c_str(), voc->get_word_id(w1),
-			voc->get_word_info(w1).second);
-	printf("%s id=%d, freq=%d\n", w1.c_str(), voc->get_word_id(w1),
-			voc->get_word_info(w1).second);
-	printf("%s id=%d, freq=%d\n", w1.c_str(), voc->get_word_id(w1),
-			voc->get_word_info(w1).second);
-	printf("%s id=%d, freq=%d\n", w1.c_str(), voc->get_word_id(w1),
-			voc->get_word_info(w1).second);
-	printf("%s id=%d, freq=%d\n", w1.c_str(), voc->get_word_id(w1),
-			voc->get_word_info(w1).second);
-	printf("%s id=%d, freq=%d\n", w1.c_str(), voc->get_word_id(w1),
-			voc->get_word_info(w1).second);
-	printf("%s id=%d, freq=%d\n", w1.c_str(), voc->get_word_id(w1),
-			voc->get_word_info(w1).second);
-	printf("%s id=%d, freq=%d\n", w1.c_str(), voc->get_word_id(w1),
-			voc->get_word_info(w1).second);
-	printf("%s id=%d, freq=%d\n", w1.c_str(), voc->get_word_id(w1),
-			voc->get_word_info(w1).second);
-	printf("%s id=%d, freq=%d\n", w1.c_str(), voc->get_word_id(w1),
-			voc->get_word_info(w1).second);
-	printf("%s id=%d, freq=%d\n", w1.c_str(), voc->get_word_id(w1),
-			voc->get_word_info(w1).second);
-	printf("%s id=%d, freq=%d\n", w1.c_str(), voc->get_word_id(w1),
-			voc->get_word_info(w1).second);
-	printf("%s id=%d, freq=%d\n", w1.c_str(), voc->get_word_id(w1),
-			voc->get_word_info(w1).second);
-	printf("%s id=%d, freq=%d\n", w1.c_str(), voc->get_word_id(w1),
-			voc->get_word_info(w1).second);
-	printf("%s id=%d, freq=%d\n", w1.c_str(), voc->get_word_id(w1),
-			voc->get_word_info(w1).second);
-
-	voc->print_contents();
-}
-
 

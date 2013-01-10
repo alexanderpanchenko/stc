@@ -4,20 +4,20 @@ Classifier::Classifier(string stopwords_file, string stopos_file,
 		string vocabulary_file, string model_file, string relations_file, bool verbose)
 {
 	// Save the resources of the model
-	this->_verbose = verbose;
-	this->_stopwords_file = stopwords_file;
-	this->_stopos_file = stopos_file;
-	this->_vocabulary_file = vocabulary_file;
-	this->_model_file = model_file;
-	this->_relations_file = relations_file;
+	_verbose = verbose;
+	_stopwords_file = stopwords_file;
+	_stopos_file = stopos_file;
+	_vocabulary_file = vocabulary_file;
+	_model_file = model_file;
+	_relations_file = relations_file;
 
 	// Initialize the data
-	this->_stopwords = NULL;
-	this->_stopos = NULL;
-	this->_vocabulary = NULL;
-	this->_model = NULL;
-	this->_expander = NULL;
-	this->_model_is_loaded = false;
+	_stopwords = NULL;
+	_stopos = NULL;
+	_vocabulary = NULL;
+	_model = NULL;
+	_expander = NULL;
+	_model_is_loaded = false;
 
 	// Load resources required for training
 	bool training_resources_exist =
@@ -37,27 +37,35 @@ Classifier::Classifier(string stopwords_file, string stopos_file,
 }
 
 bool Classifier::load_train_resources(){
-	this->_stopwords = new Vocabulary(this->_stopwords_file, _verbose);
-	this->_stopos = new Vocabulary(this->_stopos_file, _verbose);
+	_stopwords = new Vocabulary(_stopwords_file, _verbose);
+	_stopos = new Vocabulary(_stopos_file, _verbose);
 	return true;
 }
 
 bool Classifier::load_predict_resources(){
 	// Load the resources
-	this->_vocabulary = new FreqVocabulary(this->_vocabulary_file, _verbose);
-	this->_model = load_model(this->_model_file.c_str());
-	this->_expander = new TextExpander(this->_relations_file, *(this->_vocabulary), _verbose);
+	_vocabulary = new FreqVocabulary(_vocabulary_file, _verbose);
+	_model = load_model(_model_file.c_str());
+	_expander = new TextExpander(_relations_file, *(_vocabulary), _verbose);
 
-	if(this->_vocabulary->size() <= 2) printf("Warning: Vocabulary contains only two or less words.\n");
-	this->_model_is_loaded = true;
+	if(_vocabulary->size() <= 2) printf("Warning: Vocabulary contains only two or less words.\n");
+	_model_is_loaded = true;
 	return true;
 }
 
 Classifier::~Classifier() {
-	// Free resources
-	if(this->_stopos != NULL) delete this->_stopos;
-	if(this->_stopwords != NULL) delete this->_stopwords;
+	delete _stopos;
+	delete _stopwords;
 	unload_predict_resources();
+}
+
+void Classifier::unload_predict_resources(){
+	delete _vocabulary;
+	delete _expander;
+	if(_model != NULL) {
+		free_and_destroy_model(&_model);
+		_model = NULL;
+	}
 }
 
 bool Classifier::model_is_loaded() {
@@ -84,14 +92,7 @@ string Classifier::get_relations_file() {
 	return _relations_file;
 }
 
-void Classifier::unload_predict_resources(){
-	if(this->_vocabulary != NULL) delete this->_vocabulary;
-	if(this->_expander != NULL) delete this->_expander;
-	if(this->_model != NULL) {
-		free_and_destroy_model(&_model);
-		this->_model = NULL;
-	}
-}
+
 
 /*
  * Loads text(s) from an XML file to memory.
@@ -185,29 +186,6 @@ TextToClassify* Classifier::load_texts(string input_fpath) {
 			token_it++;
 		}
 
-
-		////////////////////////////////////
-		/*
-		// Add a fake token to the end
-		token_cur = create_token();
-		string tmp;
-		tmp = " ";
-		token_cur->sSurface = new char[strlen(tmp.c_str())+1];
-		sprintf(token_cur->sSurface, "%s", tmp.c_str());
-
-		tmp = "NN";
-		token_cur->sPOS = new char[strlen(tmp.c_str())+1];
-		sprintf(token_cur->sPOS, "%s", tmp.c_str());
-
-		tmp = " ";
-		token_cur->sLemma = new char[strlen(tmp.c_str())+1];
-		sprintf(token_cur->sLemma, "%s", tmp.c_str());
-
-		token_prev->pNext = token_cur;
-		*/
-		////////////////////////////////////
-
-
 		// Set a link between previous and current structures
 		if(text_beg == NULL) text_beg = text_cur;
 		else text_prev->pNext = text_cur;
@@ -262,7 +240,7 @@ list<bool> Classifier::text2vector(TextToClassify* text, string output_fpath,
 	// Initialization
 	list<bool> has_feature_list;
 	FILE* output_file = fopen(output_fpath.c_str(), "w");
-	if(!_model_is_loaded) this->_vocabulary = new FreqVocabulary();
+	if(!_model_is_loaded) _vocabulary = new FreqVocabulary();
 	int count = 0;
 	TokenToClassify* token;
 	BowVector* features;
@@ -359,8 +337,8 @@ list<bool> Classifier::text2vector(TextToClassify* text, string output_fpath,
 
 	// Save the files
 	if(!_model_is_loaded) {
-		this->_vocabulary->save(this->_vocabulary_file);
-		delete this->_vocabulary;
+		_vocabulary->save(_vocabulary_file);
+		delete _vocabulary;
 	}
 	fclose(output_file);
 	//string s1(output_file); s1 = s1 + ".reconstr";reconstruct(output_file, s1.c_str() , s.c_str());
@@ -404,7 +382,7 @@ void Classifier::reconstruct_vector(string input_vector, string output_texts, st
 		while(token_it != end_it) {
 			string token = *token_it;
 			long id = strtol(token.c_str(),NULL,10);
-			fprintf(f, "%s:%d ", voc->get_word_by_id_debug(id).c_str(), id);
+			fprintf(f, "%s:%ld ", voc->get_word_by_id_debug(id).c_str(), id);
 			token_it++;
 		}
 
@@ -435,11 +413,11 @@ bool Classifier::train(TextToClassify* text, bool is_unit_length){
 	}
 
 	// Destroy existing model
-	this->_model_is_loaded = false;
+	_model_is_loaded = false;
 	unload_predict_resources();
 
 	// Train the model
-	string vectors_file = this->_model_file + ".csv";
+	string vectors_file = _model_file + ".csv";
 	TextExpanderParams* default_exp_params = new TextExpanderParams();
 	list<bool> has_data = text2vector(text, vectors_file, default_exp_params, is_unit_length);
 	if(has_data.size() == 0){
@@ -447,12 +425,12 @@ bool Classifier::train(TextToClassify* text, bool is_unit_length){
 		return false;
 	}
 
-	train_fs(vectors_file.c_str(), this->_model_file.c_str());
+	train_fs(vectors_file.c_str(), _model_file.c_str());
 	delete default_exp_params;
 
 	// Load the new model
 	load_predict_resources();
-	this->_model_is_loaded = true;
+	_model_is_loaded = true;
 
 	// Remove temporaty files
 	if(DELETE_TMP){
@@ -485,7 +463,7 @@ bool Classifier::train(string input_file, bool is_unit_length) {
 		return false;
 	}
 
-	// Train the model and save it to this->_model_file
+	// Train the model and save it to _model_file
 	bool result = train(texts, is_unit_length);
 
 	// Delete the training data
@@ -514,13 +492,14 @@ bool Classifier::predict(TextToClassify* texts, string output_file, TextExpander
 		return false;
 	}
 
-	list<pred> labels = predict_fs(vectors_file.c_str(), this->_model);
+	list<pred> labels = predict_fs(vectors_file.c_str(), _model);
 	text2xml(texts, has_data, labels, output_file);
 
 	if(DELETE_TMP){
 		wpath vectors_path(vectors_file);
 		if(exists(vectors_path)) remove(vectors_path);
 	}
+	return true;
 }
 
 /**
@@ -568,7 +547,7 @@ bool Classifier::predict(string input_file, TextExpanderParams* exp_params,  boo
 	}
 
 	// Predict labels of the texts
-	list<pred> labels = predict_fs(vectors_file.c_str(), this->_model);
+	list<pred> labels = predict_fs(vectors_file.c_str(), _model);
 
 	// Delete input file
 	string input_file_copy(input_file); // Bug: string destroyed after remove
@@ -598,7 +577,7 @@ bool Classifier::text2xml(TextToClassify* text, list<bool> hasdata,
 
 	// Get the number of texts
 	TextToClassify* first_text = text;
-	int texts_count = 0;
+	unsigned int texts_count = 0;
 	bool texts_has_no_id = true;
 	while(text){
 		texts_has_no_id = texts_has_no_id && (text->iID == 0);
@@ -609,7 +588,6 @@ bool Classifier::text2xml(TextToClassify* text, list<bool> hasdata,
 
 	// Data are consistent -> write output
 	if((hasdata.size() == texts_count) && (labels.size() == texts_count)){
-
 		// Open output file
 		FILE* output_file = fopen(output_fpath.c_str(), "w");
 		if (!output_file){
@@ -631,7 +609,7 @@ bool Classifier::text2xml(TextToClassify* text, list<bool> hasdata,
 		while(text && labels_it != labels.end() && hasdata_it != hasdata.end()){
 			label = (*hasdata_it ? (*labels_it).category : NEGATIVE_CLASS_I);
 			confidence = (*hasdata_it ? (*labels_it).probability : 0);
-			fprintf(output_file, "<%s %s='%d' %s='%s' %s='%0.4f'>\n",
+			fprintf(output_file, "<%s %s='%ld' %s='%s' %s='%0.4f'>\n",
 					TEXT_TAG, ID_ATT, (texts_has_no_id ? text_num : text->iID),
 					CLASS_ATT, get_label_name(label).c_str(),
 					CONFIDENCE_ATT, confidence);
@@ -673,25 +651,12 @@ static const boost::regex has_number_exp("\\d+");
  * 3) it is a number or a mix of number and letters
  * */
 bool Classifier::skip_token(string token) {
-	bool is_a_stopword = this->_stopwords->contains(token);
+	bool is_a_stopword = _stopwords->contains(token);
 	//static const boost::regex is_number_exp("[\\s.,]*\\d+[\\s.]*\\d*");
 	//bool is_a_number = boost::regex_(token, is_number_exp);
 	//static const boost::regex has_number_exp("\\d+");
 	bool has_number = boost::regex_search(token, has_number_exp);
 	return is_a_stopword || has_number;
-}
-
-/**
- * This method generates a test feature node.
- * */
-feature_node* Classifier::generate_feature_node(int size) {
-	struct feature_node* vector;
-	vector = (struct feature_node *) realloc(vector, size*sizeof(struct feature_node));
-	for(int i=0; i<size; i++){
-		vector[i].index = i;
-		vector[i].value = 0.33;
-	}
-	return vector;
 }
 
 /**
@@ -744,65 +709,4 @@ void Classifier::delete_text(TextToClassify* text) {
 		text = next_text;
 	}
 }
-
-/*
-bool Classifier::insert_labels(string xml_fpath, list<int> labels, list<bool> has_data) {
-	// Get XML
-	string xml_string;
-	ifstream xml_file;
-	xml_file.open(xml_fpath.c_str());
-	string line;
-	getline(xml_file,line);
-	while (xml_file) {
-		xml_string += line + "\n";
-		getline(xml_file,line);
-	}
-	char* xml_text = (char*)xml_string.c_str();
-	xml_document<> document;
-	document.parse<0>(xml_text);
-	xml_file.close();
-
-	// Read the XML
-	list<int>::iterator label = labels.begin();
-	list<bool>::iterator data = has_data.begin();
-	int xml_size = 0;
-	for (xml_node<>* node = document.first_node(ROOT_TAG)->first_node(TEXT_TAG); node; node = node->next_sibling()) {
-		// Set the attribute
-	 	if(*label == POSITIVE_CLASS_I && *data == true){
-	 		node->first_attribute(CLASS_ATT)->value(POSITIVE_CLASS_ATT);
-	 	}
-	 	else if (*label == NEGATIVE_CLASS_I && *data == true){
-	 		node->first_attribute(CLASS_ATT)->value(NEGATIVE_CLASS_ATT);
-	 	}
-	 	else if(*data == false){
-	 		node->first_attribute(CLASS_ATT)->value(UNKNOWN_CLASS_ATT);
-	 	}
-
-	 	//printf("%s %d %d\n", attr->value(), *i, *j); // Debug
-	 	label++;
-	 	data++;
-	 	xml_size++;
-	}
-
-	// Check that the data are consistent
-	bool has_inconsistency = (labels.size() != has_data.size() || labels.size() != xml_size);
-	if(has_inconsistency){
-		printf("Inconsistency in the prediction results\n.");
-		return false;
-	}
-	else{
-		// Save the XML
-		string s;
-		print(back_inserter(s), document, 0);
-		ofstream ofFileToWrite;
-		ofFileToWrite.open(xml_fpath.c_str(), ios::trunc);
-		ofFileToWrite << "<?xml version=\"1.0\"?>\n" << s ;
-		ofFileToWrite.close();
-		return true;
-	}
-}
-*/
-
-
-
 

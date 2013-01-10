@@ -4,7 +4,7 @@
 using namespace boost::filesystem;
 
 
-bool file_exists(char* fileName, bool silent) {
+bool file_exists(const char* fileName, bool silent) {
 	path p(fileName);
     if(exists(p)) {
     	return true;
